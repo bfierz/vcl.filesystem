@@ -27,7 +27,7 @@
 // ZipLib
 #include <ZipLib/ZipFile.h>
 
-namespace Vcl { namespace FileSystem { namespace Zip
+namespace Vcl { namespace FileSystem { namespace Util
 {
 	Archive::Archive(path zip_file)
 	: _file{ zip_file }

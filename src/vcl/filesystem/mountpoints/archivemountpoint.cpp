@@ -28,15 +28,15 @@ namespace Vcl { namespace FileSystem
 {
 	ArchiveMountPoint::ArchiveMountPoint(std::string name, path mount_path, path volume_path)
 	: MountPoint{ std::move(name), std::move(mount_path) }
-	, _archive{ mount_path }
+	, _archive{ volume_path }
 	{
 	}
 
 	bool ArchiveMountPoint::exists(const path& entry) const
 	{
 		// Remove the mount path from the entry
-		path rel_path = entry.string().substr(mountPath().string().length());
+		path rel_path = entry.string().substr(mountPath().string().length() + 1);
 
-		return _archive.entryExists(entry);
+		return _archive.entryExists(rel_path);
 	}
 }}

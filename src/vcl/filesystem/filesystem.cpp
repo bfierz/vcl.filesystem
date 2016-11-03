@@ -57,7 +57,7 @@ namespace Vcl { namespace FileSystem
 		auto mp = std::accumulate(_mountPoints.begin(), _mountPoints.end(), init, [&entry](const MountPoint* a, const std::unique_ptr<MountPoint>& b) -> const MountPoint*
 		{
 			if ((!a || a->mountPath().string().length() < b->mountPath().string().length()) && 
-			    b->mountPath().compare(entry) < 0)
+			    b->mountPath().compare(entry) <= 0)
 				return b.get();
 			else
 				return a;

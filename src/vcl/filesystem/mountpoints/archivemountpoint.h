@@ -50,6 +50,6 @@ namespace Vcl { namespace FileSystem
 
 	private:
 		//! Mounted archive 
-		Zip::Archive _archive;
+		Util::Archive _archive;
 	};
 }}

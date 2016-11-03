@@ -48,7 +48,7 @@ namespace std
 	};
 }
 
-namespace Vcl { namespace FileSystem { namespace Zip
+namespace Vcl { namespace FileSystem { namespace Util
 {
 	class ArchivePathIterator : public std::unordered_map<std::experimental::filesystem::path, std::shared_ptr<ZipArchiveEntry>>::const_iterator
 	{

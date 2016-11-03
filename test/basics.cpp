@@ -27,6 +27,7 @@
 #include <vcl/config/global.h>
 
 // Include the relevant parts from the library
+#include <vcl/filesystem/mountpoints/archivemountpoint.h>
 #include <vcl/filesystem/mountpoints/volumemountpoint.h>
 #include <vcl/filesystem/filesystem.h>
 #include <vcl/filesystem/util/archive.h>
@@ -34,22 +35,35 @@
 // Google test
 #include <gtest/gtest.h>
 
-TEST(FileSystemTest, PathExistence)
+TEST(FileSystemTest, VolumePathExistence)
 {
 	using namespace Vcl::FileSystem;
 
 	FileSystem fs;
-	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "C:\\texts", "/texts"));
-	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "C:\\subtexts", "/texts/subs"));
+	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "/texts", "C:\\texts"));
+	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "/texts/subs", "C:\\subtexts"));
 
 	fs.exists("/texts/file.txt");
 	fs.exists("/texts/subs.txt");
 	fs.exists("/texts/subs/file2.txt");
 }
 
+TEST(FileSystemTest, ArchivePathExistence)
+{
+	using namespace Vcl::FileSystem;
+
+	FileSystem fs;
+	fs.addMountPoint("", std::make_unique<ArchiveMountPoint>("Content", "/content", "simple.zip"));
+	fs.addMountPoint("", std::make_unique<ArchiveMountPoint>("SubContent", "/content/sub", "simple.zip"));
+
+	EXPECT_TRUE(fs.exists("/content/simple.txt"));
+	EXPECT_TRUE(fs.exists("/content/sub/simple.txt"));
+	EXPECT_TRUE(fs.exists("/content/sub/test/test.txt"));
+}
+
 TEST(FileSystemTest, ListZipFileContent)
 {
-	using namespace Vcl::FileSystem::Zip;
+	using namespace Vcl::FileSystem::Util;
 
 	// Archive to check
 	Archive ar{ "simple.zip" };
