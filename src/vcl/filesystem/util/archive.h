@@ -76,6 +76,13 @@ namespace Vcl { namespace FileSystem { namespace Util
 		 */
 		bool entryExists(const path& entry) const;
 
+		/*!
+		 *	\brief Access a specific entry of the archive
+		 *	\param entry_path Path to the entry relative to the archive
+		 *	\returns the pointer to the entry
+		 */
+		std::shared_ptr<ZipArchiveEntry> entry(const path& entry_path) const;
+
 		ArchivePathIterator beginPaths() const { return{ _entries.cbegin() }; }
 		ArchivePathIterator endPaths() const { return{ _entries.cend() }; }
 

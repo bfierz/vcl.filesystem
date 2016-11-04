@@ -33,7 +33,6 @@ namespace Vcl { namespace FileSystem
 	: MountPoint{ std::move(name), std::move(mount_path) }
 	, _volumePath{ volume_path }
 	{
-
 	}
 
 	std::shared_ptr<FileReader> VolumeMountPoint::createReader(const path& file_name)

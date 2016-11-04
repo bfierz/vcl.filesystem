@@ -6,9 +6,11 @@ PROJECT(vcl.filesystem)
 SUBDIRS(externals/ziplib)
 
 SET(VCL_FILESYSTEM_READERS_INC
+	src/vcl/filesystem/readers/archivefilereader.h
 	src/vcl/filesystem/readers/volumefilereader.h
 )
 SET(VCL_FILESYSTEM_READERS_SRC
+	src/vcl/filesystem/readers/archivefilereader.cpp
 	src/vcl/filesystem/readers/volumefilereader.cpp
 )
 

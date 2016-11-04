@@ -22,40 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "archive.h"
+#include "archivefilereader.h"
 
-// ZipLib
+ // ZipLib
 #include <ZipLib/ZipFile.h>
 
-namespace Vcl { namespace FileSystem { namespace Util
+namespace Vcl { namespace FileSystem
 {
-	Archive::Archive(path zip_file)
-	: _file{ zip_file }
+	ArchiveFileReader::ArchiveFileReader(path virtual_path, std::shared_ptr<ZipArchiveEntry> entry)
+	: FileReader(virtual_path)
+	, _entry(std::move(entry))
 	{
-		_archive = ZipFile::Open(_file.string());
-
-		if (_archive)
-			enumerateFiles();
+		_stream = _entry->GetDecompressionStream();
+		_size = _entry->GetSize();
 	}
 
-	bool Archive::entryExists(const path& entry) const 
+	void ArchiveFileReader::seek(const uint64_t pos)
 	{
-		return _entries.find(entry.string()) != _entries.end();
+		_stream->seekg(pos);
+		_curr_pos = pos;
 	}
 
-	std::shared_ptr<ZipArchiveEntry> Archive::entry(const path& entry_path) const
+	uint64_t ArchiveFileReader::read(void* buf, const uint64_t buffer_size)
 	{
-		return _entries.find(entry_path.string())->second;
+		auto left_to_read = size() - pos();
+		auto read_bytes = std::min<uint64_t>(buffer_size, left_to_read);
+		_stream->read(static_cast<char*>(buf), read_bytes);
+
+		_curr_pos += read_bytes;
+		return read_bytes;
 	}
 
-	void Archive::enumerateFiles()
+	bool ArchiveFileReader::eof() const
 	{
-		// Adds all the entries to an internal list
-		auto nr_entries = _archive->GetEntriesCount();
-		for (decltype(nr_entries) e = 0; e < nr_entries; ++e)
-		{
-			auto entry = _archive->GetEntry(static_cast<int>(e));
-			_entries.emplace(entry->GetFullName(), entry);
-		}
+		return _stream->eof();
 	}
-}}}
+
+	uint64_t ArchiveFileReader::size() const
+	{
+		return _size;
+	}
+
+	uint64_t ArchiveFileReader::pos() const
+	{
+		return _curr_pos;
+	}
+}}

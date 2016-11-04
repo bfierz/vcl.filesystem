@@ -24,6 +24,9 @@
  */
 #include "archivemountpoint.h"
 
+ // VCL File System Library
+#include "../readers/archivefilereader.h"
+
 namespace Vcl { namespace FileSystem
 {
 	ArchiveMountPoint::ArchiveMountPoint(std::string name, path mount_path, path volume_path)
@@ -34,7 +37,11 @@ namespace Vcl { namespace FileSystem
 
 	std::shared_ptr<FileReader> ArchiveMountPoint::createReader(const path& file_name)
 	{
-		return nullptr;
+		// Remove the mount path from the entry
+		path rel_path = file_name.string().substr(mountPath().string().length() + 1);
+
+		auto entry = _archive.entry(rel_path);
+		return std::make_shared<ArchiveFileReader>(file_name, entry);
 	}
 
 	bool ArchiveMountPoint::exists(const path& entry) const
