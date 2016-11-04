@@ -32,6 +32,11 @@ namespace Vcl { namespace FileSystem
 	{
 	}
 
+	std::shared_ptr<FileReader> ArchiveMountPoint::createReader(const path& file_name)
+	{
+		return nullptr;
+	}
+
 	bool ArchiveMountPoint::exists(const path& entry) const
 	{
 		// Remove the mount path from the entry

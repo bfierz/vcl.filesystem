@@ -22,3 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "filereader.h"
+
+namespace Vcl { namespace FileSystem
+{
+	FileReader::FileReader(path virtual_path)
+	: _virtualPath(std::move(virtual_path))
+	{
+
+	}
+}}

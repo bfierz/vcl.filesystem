@@ -4,6 +4,13 @@ PROJECT(vcl.filesystem)
 
 # External libraries
 
+SET(VCL_FILESYSTEM_READERS_INC
+	src/vcl/filesystem/readers/volumefilereader.h
+)
+SET(VCL_FILESYSTEM_READERS_SRC
+	src/vcl/filesystem/readers/volumefilereader.cpp
+)
+
 SET(VCL_FILESYSTEM_MP_INC
 	src/vcl/filesystem/mountpoints/archivemountpoint.h
 	src/vcl/filesystem/mountpoints/memorymountpoint.h
@@ -38,6 +45,8 @@ SET(VCL_FILESYSTEM_SRC
 SET(SOURCE
 	${VCL_FILESYSTEM_MP_INC}
 	${VCL_FILESYSTEM_MP_SRC}
+	${VCL_FILESYSTEM_READERS_INC}
+	${VCL_FILESYSTEM_READERS_SRC}
 	${VCL_FILESYSTEM_UTIL_INC}
 	${VCL_FILESYSTEM_UTIL_SRC}
 	${VCL_FILESYSTEM_INC}
@@ -45,6 +54,7 @@ SET(SOURCE
 )
 
 SOURCE_GROUP("mountpoints" FILES ${VCL_FILESYSTEM_MP_SRC} ${VCL_FILESYSTEM_MP_INC})
+SOURCE_GROUP("readers" FILES ${VCL_FILESYSTEM_READERS_SRC} ${VCL_FILESYSTEM_READERS_INC})
 SOURCE_GROUP("util" FILES ${VCL_FILESYSTEM_UTIL_SRC} ${VCL_FILESYSTEM_UTIL_INC})
 SOURCE_GROUP("" FILES ${VCL_FILESYSTEM_SRC} ${VCL_FILESYSTEM_INC})
 

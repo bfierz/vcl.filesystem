@@ -29,10 +29,19 @@
 
 namespace Vcl { namespace FileSystem
 {
-	void FileSystem::addMountPoint(path prefix, std::unique_ptr<MountPoint> mp)
+	void FileSystem::addMountPoint(std::unique_ptr<MountPoint> mp)
 	{
 		// Store the mount point
 		_mountPoints.emplace_back(std::move(mp));
+	}
+
+	std::shared_ptr<FileReader> FileSystem::createReader(const path& file_name)
+	{
+		if (!exists(file_name))
+			throw std::domain_error(file_name.string() + " does not exist.");
+
+		auto mp = findMountPoint(file_name);
+		return mp->createReader(file_name);
 	}
 
 	bool FileSystem::exists(const path& entry)
@@ -48,13 +57,13 @@ namespace Vcl { namespace FileSystem
 		}
 	}
 
-	const MountPoint* FileSystem::findMountPoint(path entry)
+	MountPoint* FileSystem::findMountPoint(path entry) const
 	{
 		// Only consider the directory of the path to search for the mount point
 		entry.remove_filename();
 
-		const MountPoint* init{ nullptr };
-		auto mp = std::accumulate(_mountPoints.begin(), _mountPoints.end(), init, [&entry](const MountPoint* a, const std::unique_ptr<MountPoint>& b) -> const MountPoint*
+		MountPoint* init{ nullptr };
+		auto mp = std::accumulate(_mountPoints.begin(), _mountPoints.end(), init, [&entry](MountPoint* a, const std::unique_ptr<MountPoint>& b) -> MountPoint*
 		{
 			if ((!a || a->mountPath().string().length() < b->mountPath().string().length()) && 
 			    b->mountPath().compare(entry) <= 0)

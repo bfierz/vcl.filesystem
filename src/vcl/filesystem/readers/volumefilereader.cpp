@@ -22,40 +22,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
+#include "volumefilereader.h"
 
-// VCL configuration
-#include <vcl/config/global.h>
-
-// VCL File System Library
-#include "../mountpoint.h"
+// Windows
+#include <windows.h>
 
 namespace Vcl { namespace FileSystem
 {
-	class VolumeMountPoint : public MountPoint
+	uint64_t GetFileSize(std::wstring const &path)
+	{ 
+		WIN32_FIND_DATAW data;
+		HANDLE h = FindFirstFileW(path.c_str(), &data);
+		if (h == INVALID_HANDLE_VALUE)
+			return -1;
+
+		FindClose(h);
+
+		return data.nFileSizeLow | (__int64) data.nFileSizeHigh << 32;
+	}
+
+	VolumeFileReader::VolumeFileReader(path virtual_path, path volume_path)
+	: FileReader(virtual_path)
+	, _volumePath(std::move(volume_path))
 	{
-	public:
-		/*!
-		 *	\brief Create a new mount point
-		 *	\param mount_path path to mount the volume directory to
-		 *	\param volume_path path to a directory on an actual volume to be mounted
-		 *
-		 *	Create a new mount point that maps a directory from a native volume to a specific mount point
-		 */
-		VolumeMountPoint(std::string name, path mount_path, path volume_path);
+		_size = GetFileSize(_volumePath.wstring());
 
-	protected:		
-		std::shared_ptr<FileReader> createReader(const path& file_name) override;
-		bool exists(const path& entry) const override;
+		_file.open(_volumePath.c_str(), std::ios::binary);
+	}
 
-	private:
-		path convertToVolumePath(const path& virtual_path) const;
+	void VolumeFileReader::seek(const uint64_t pos)
+	{
+		_file.seekg(pos);
+		_curr_pos = pos;
+	}
 
-	private:
-		//! Name of the mount point
-		std::string _name;
+	uint64_t VolumeFileReader::read(void* buf, const uint64_t buffer_size)
+	{
+		auto left_to_read = size() - pos();
+		auto read_bytes = std::min<uint64_t>(buffer_size, left_to_read);
+		_file.read(static_cast<char*>(buf), read_bytes);
 
-		//! Native path to the volume loaded
-		path _volumePath;
-	};
+		_curr_pos += read_bytes;
+		return read_bytes;
+	}
+
+	bool VolumeFileReader::eof() const
+	{
+		return _file.eof();
+	}
+
+	uint64_t VolumeFileReader::size() const
+	{
+		return _size;
+	}
+
+	uint64_t VolumeFileReader::pos() const
+	{
+		return _curr_pos;
+	}
 }}

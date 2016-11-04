@@ -26,6 +26,9 @@
 // VCL configuration
 #include <vcl/config/global.h>
 
+// C++ standard library
+#include <fstream>
+
 // Include the relevant parts from the library
 #include <vcl/filesystem/mountpoints/archivemountpoint.h>
 #include <vcl/filesystem/mountpoints/volumemountpoint.h>
@@ -35,17 +38,78 @@
 // Google test
 #include <gtest/gtest.h>
 
-TEST(FileSystemTest, VolumePathExistence)
+class SimpleFileSystemTest : public ::testing::Test
+{
+protected:
+	void SetUp() override
+	{
+		namespace fs = std::experimental::filesystem;
+
+		ASSERT_FALSE(exists(sample_dir)) << "Sample content directory must not exists.";
+		ASSERT_TRUE(fs::create_directory(sample_dir)) << "Sample content directory could not be created.";
+		ASSERT_TRUE(fs::create_directory(sample_sub_dir)) << "Sample content could not be created.";
+
+		const fs::path sample_file_1{ sample_dir / "SubText.txt" };
+		const fs::path sample_file_2{ sample_dir / "File2.txt" };
+		const fs::path sample_file_3{ sample_sub_dir / "File3.txt" };
+
+		std::ofstream file1{ sample_file_1.string() };
+		ASSERT_TRUE(file1.is_open()) << "Sample content could not be created.";
+		file1 << "File1";
+		file1.close();
+
+		std::ofstream file2{ sample_file_2.string() };
+		ASSERT_TRUE(file2.is_open()) << "Sample content could not be created.";
+		file2 << "File2";
+		file2.close();
+
+		std::ofstream file3{ sample_file_3.string() };
+		ASSERT_TRUE(file3.is_open()) << "Sample content could not be created.";
+		file3 << "File3";
+		file3.close();
+	}
+
+	void TearDown() override
+	{
+		namespace fs = std::experimental::filesystem;
+
+		const fs::path sample_dir{ "SampleContent" };
+		ASSERT_TRUE(exists(sample_dir)) << "Sample content directory must exists.";
+		ASSERT_EQ(fs::remove_all(sample_dir), 3);
+	}
+
+	const std::experimental::filesystem::path sample_dir{ "SampleContent" };
+	const std::experimental::filesystem::path sample_sub_dir{ "SampleContent/SubText" };
+};
+
+TEST_F(SimpleFileSystemTest, VolumePathExistence)
 {
 	using namespace Vcl::FileSystem;
 
 	FileSystem fs;
-	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "/texts", "C:\\texts"));
-	fs.addMountPoint("", std::make_unique<VolumeMountPoint>("Basics", "/texts/subs", "C:\\subtexts"));
+	fs.addMountPoint(std::make_unique<VolumeMountPoint>("Basics", "/texts", "SampleContent"));
+	fs.addMountPoint(std::make_unique<VolumeMountPoint>("Basics", "/texts/subs", "SampleContent/SubText"));
 
-	fs.exists("/texts/file.txt");
-	fs.exists("/texts/subs.txt");
-	fs.exists("/texts/subs/file2.txt");
+	EXPECT_TRUE(fs.exists("/texts/File2.txt"));
+	EXPECT_TRUE(fs.exists("/texts/SubText.txt"));
+	EXPECT_TRUE(fs.exists("/texts/subs/File3.txt"));
+}
+
+TEST_F(SimpleFileSystemTest, ReadVolumeFile)
+{
+	using namespace Vcl::FileSystem;
+
+	FileSystem fs;
+	fs.addMountPoint(std::make_unique<VolumeMountPoint>("Basics", "/texts", "SampleContent"));
+	fs.addMountPoint(std::make_unique<VolumeMountPoint>("Basics", "/texts/subs", "SampleContent/SubText"));
+
+	auto reader = fs.createReader("/texts/File2.txt");
+
+	char text[128];
+	auto read_bytes = reader->read(text, sizeof(text));
+	text[5] = 0;
+
+	EXPECT_STREQ(text, "File2");
 }
 
 TEST(FileSystemTest, ArchivePathExistence)
@@ -53,8 +117,8 @@ TEST(FileSystemTest, ArchivePathExistence)
 	using namespace Vcl::FileSystem;
 
 	FileSystem fs;
-	fs.addMountPoint("", std::make_unique<ArchiveMountPoint>("Content", "/content", "simple.zip"));
-	fs.addMountPoint("", std::make_unique<ArchiveMountPoint>("SubContent", "/content/sub", "simple.zip"));
+	fs.addMountPoint(std::make_unique<ArchiveMountPoint>("Content", "/content", "simple.zip"));
+	fs.addMountPoint(std::make_unique<ArchiveMountPoint>("SubContent", "/content/sub", "simple.zip"));
 
 	EXPECT_TRUE(fs.exists("/content/simple.txt"));
 	EXPECT_TRUE(fs.exists("/content/sub/simple.txt"));
@@ -87,4 +151,20 @@ TEST(FileSystemTest, ListZipFileContent)
 	{
 		EXPECT_TRUE(ar.entryExists(p)) << "Missing " << p;
 	}
+}
+
+TEST(FileSystemTest, ReadArchiveFile)
+{
+	using namespace Vcl::FileSystem;
+
+	FileSystem fs;
+	fs.addMountPoint(std::make_unique<ArchiveMountPoint>("Content", "/content", "simple.zip"));
+
+	auto reader = fs.createReader("/content/simple.txt");
+
+	char text[128];
+	auto read_bytes = reader->read(text, sizeof(text));
+	text[6] = 0;
+
+	EXPECT_STREQ(text, "Simple");
 }

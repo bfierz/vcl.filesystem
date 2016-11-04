@@ -46,12 +46,12 @@ namespace Vcl { namespace FileSystem
 		/*!
 		 *	\brief Add a new mount point to the virtual file system
 		 */
-		void addMountPoint(path prefix, std::unique_ptr<MountPoint> mp);
+		void addMountPoint(std::unique_ptr<MountPoint> mp);
 
 		 /*!
 		  *	\brief Create a new file reader
 		  */
-		FileReader createReader(path file_name);
+		std::shared_ptr<FileReader> createReader(const path& file_name);
 
 		 /*!
 		  *	\brief Check if a path exists
@@ -66,7 +66,7 @@ namespace Vcl { namespace FileSystem
 		 *	\param entry path to search the mount point for
 		 *	\returns the mount point belonging to the path 'entry'
 		 */
-		const MountPoint* findMountPoint(path entry);
+		MountPoint* findMountPoint(path entry) const;
 
 	private:
 		/// Mount points

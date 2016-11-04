@@ -46,6 +46,7 @@ namespace Vcl { namespace FileSystem
 		ArchiveMountPoint(std::string name, path mount_path, path volume_path);
 
 	protected:
+		std::shared_ptr<FileReader> createReader(const path& file_name) override;
 		bool exists(const path& entry) const override;
 
 	private:

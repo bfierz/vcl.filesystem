@@ -27,35 +27,37 @@
 // VCL configuration
 #include <vcl/config/global.h>
 
+// C++ standard library
+#include <fstream>
+
 // VCL File System Library
-#include "../mountpoint.h"
+#include "../filereader.h"
 
 namespace Vcl { namespace FileSystem
 {
-	class VolumeMountPoint : public MountPoint
+	class VolumeFileReader : public FileReader
 	{
 	public:
-		/*!
-		 *	\brief Create a new mount point
-		 *	\param mount_path path to mount the volume directory to
-		 *	\param volume_path path to a directory on an actual volume to be mounted
-		 *
-		 *	Create a new mount point that maps a directory from a native volume to a specific mount point
-		 */
-		VolumeMountPoint(std::string name, path mount_path, path volume_path);
+		VolumeFileReader(path virtual_path, path volume_path);
 
-	protected:		
-		std::shared_ptr<FileReader> createReader(const path& file_name) override;
-		bool exists(const path& entry) const override;
+		void     seek(const uint64_t pos) override;
+		uint64_t read(void* buf, const uint64_t size) override;
+
+		bool     eof() const override;
+		uint64_t size() const override;
+		uint64_t pos() const override;
 
 	private:
-		path convertToVolumePath(const path& virtual_path) const;
-
-	private:
-		//! Name of the mount point
-		std::string _name;
-
-		//! Native path to the volume loaded
+		//! Path of the file on the actual volume
 		path _volumePath;
+
+		//! File pointer
+		std::ifstream _file;
+
+		//! Size of the entire file
+		uint64_t _size{ 0 };
+
+		//! Current position in the file buffer
+		uint64_t _curr_pos{ 0 };
 	};
 }}

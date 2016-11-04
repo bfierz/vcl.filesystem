@@ -24,6 +24,9 @@
  */
 #include "volumemountpoint.h"
 
+ // VCL File System Library
+#include "../readers/volumefilereader.h"
+
 namespace Vcl { namespace FileSystem
 {
 	VolumeMountPoint::VolumeMountPoint(std::string name, path mount_path, path volume_path)
@@ -33,15 +36,25 @@ namespace Vcl { namespace FileSystem
 
 	}
 
+	std::shared_ptr<FileReader> VolumeMountPoint::createReader(const path& file_name)
+	{
+		return std::make_shared<VolumeFileReader>(file_name, convertToVolumePath(file_name));
+	}
+
 	bool VolumeMountPoint::exists(const path& entry) const
 	{
+		// Check if the file exists on disk
+		return std::experimental::filesystem::exists(convertToVolumePath(entry));
+	}
+
+	VolumeMountPoint::path VolumeMountPoint::convertToVolumePath(const path& virtual_path) const
+	{
 		// Remove the mount path from the entry
-		path rel_path = entry.string().substr(mountPath().string().length());
+		path rel_path = virtual_path.string().substr(mountPath().string().length());
 
 		// Append it to the volume path
 		auto abs_path = _volumePath / rel_path;
 
-		// Check if the file exists on disk
-		return std::experimental::filesystem::exists(abs_path);
+		return std::move(abs_path);
 	}
 }}

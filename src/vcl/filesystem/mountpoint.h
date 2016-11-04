@@ -30,6 +30,9 @@
 // C++ Standard Library
 #include <filesystem>
 
+// VCL File System Library
+#include "filereader.h"
+
 namespace Vcl { namespace FileSystem
 {
 	class MountPoint
@@ -39,6 +42,11 @@ namespace Vcl { namespace FileSystem
 
 	public:
 		MountPoint(std::string name, path mount_path) : _name{ name }, _mountPath { mount_path } {}
+		
+		 /*!
+		  *	\brief Create a new file reader
+		  */
+		virtual std::shared_ptr<FileReader> createReader(const path& file_name) = 0;
 
 		//! 
 		virtual bool exists(const path& entry) const = 0;
