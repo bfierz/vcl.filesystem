@@ -1,3 +1,6 @@
 [submodule "externals/gtest"]
 	path = externals/gtest
 	url = https://github.com/google/googletest
+[submodule "externals/ziplib"]
+	path = externals/ziplib
+	url = https://bitbucket.org/bfierz/ziplib.git

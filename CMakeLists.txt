@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.6)
 PROJECT(vcl.filesystem)
 
 # External libraries
+SUBDIRS(externals/ziplib)
 
 SET(VCL_FILESYSTEM_READERS_INC
 	src/vcl/filesystem/readers/volumefilereader.h
@@ -67,14 +68,7 @@ TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src
 TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Source)
 
 TARGET_LINK_LIBRARIES(vcl.filesystem
-	debug ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Debug/bzip2.lib
-	debug ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Debug/lzma.lib
-	debug ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Debug/ZipLib.lib
-	debug ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Debug/zlib.lib
-	optimized ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Release/bzip2.lib
-	optimized ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Release/lzma.lib
-	optimized ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Release/ZipLib.lib
-	optimized ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Bin/x64/Release/zlib.lib
+	ziplib
 )
 
 # File System Unit Tests
