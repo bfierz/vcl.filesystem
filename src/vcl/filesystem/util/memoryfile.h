@@ -27,31 +27,42 @@
 // VCL configuration
 #include <vcl/config/global.h>
 
-// VCL File System Library
-#include "../util/archive.h"
-#include "../mountpoint.h"
+// C++ Standard Library
+#include <filesystem>
+#include <list>
+#include <memory>
 
-namespace Vcl { namespace FileSystem
+namespace Vcl { namespace FileSystem { namespace Util
 {
-	class ArchiveMountPoint : public MountPoint
+	struct MemoryPage
 	{
-	public:
-		/*!
-		 *	\brief Create a new mount point
-		 *	\param mount_path path to mount the volume directory to
-		 *	\param volume_path path to an archive on an actual volume to be mounted
-		 *
-		 *	Create a new mount point that maps an archive on a native volume to a specific mount point
-		 */
-		ArchiveMountPoint(std::string name, path mount_path, path volume_path);
+		uint8_t Memory[512];
+	};
 
+	class MemoryFile
+	{
 	protected:
-		std::shared_ptr<FileReader> createReader(const path& file_name) override;
-		std::shared_ptr<FileWriter> createWriter(const path& file_name) override;
-		bool exists(const path& entry) const override;
+		using path = std::experimental::filesystem::path;
+		
+	public:
+		MemoryFile(path rel_path);
+
+		size_t read(size_t offset, void* buffer, size_t size);
+		void write(size_t offset, void* buffer, size_t size);
+
+	public: // Properties
+
+		//! \returns the path of the file relative to the mount point
+		const path& relativePath() const { return _relPath; }
 
 	private:
-		//! Mounted archive 
-		Util::Archive _archive;
+		//! Relative path of the memory file
+		path _relPath;
+
+		//! Size of the content
+		size_t _size{ 0 };
+
+		//! List of memory blobs making the memory file
+		std::vector<std::unique_ptr<MemoryPage>> _pages;
 	};
-}}
+}}}

@@ -46,6 +46,7 @@ namespace Vcl { namespace FileSystem
 
 	protected:		
 		std::shared_ptr<FileReader> createReader(const path& file_name) override;
+		std::shared_ptr<FileWriter> createWriter(const path& file_name) override;
 		bool exists(const path& entry) const override;
 
 	private:

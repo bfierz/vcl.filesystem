@@ -7,10 +7,12 @@ SUBDIRS(externals/ziplib)
 
 SET(VCL_FILESYSTEM_READERS_INC
 	src/vcl/filesystem/readers/archivefilereader.h
+	src/vcl/filesystem/readers/memoryfilereader.h
 	src/vcl/filesystem/readers/volumefilereader.h
 )
 SET(VCL_FILESYSTEM_READERS_SRC
 	src/vcl/filesystem/readers/archivefilereader.cpp
+	src/vcl/filesystem/readers/memoryfilereader.cpp
 	src/vcl/filesystem/readers/volumefilereader.cpp
 )
 
@@ -27,9 +29,17 @@ SET(VCL_FILESYSTEM_MP_SRC
 
 SET(VCL_FILESYSTEM_UTIL_INC
 	src/vcl/filesystem/util/archive.h
+	src/vcl/filesystem/util/memoryfile.h
 )
 SET(VCL_FILESYSTEM_UTIL_SRC
 	src/vcl/filesystem/util/archive.cpp
+	src/vcl/filesystem/util/memoryfile.cpp
+)
+SET(VCL_FILESYSTEM_WRITERS_INC
+	src/vcl/filesystem/writers/memoryfilewriter.h
+)
+SET(VCL_FILESYSTEM_WRITERS_SRC
+	src/vcl/filesystem/writers/memoryfilewriter.cpp
 )
 
 SET(VCL_FILESYSTEM_INC
@@ -52,6 +62,8 @@ SET(SOURCE
 	${VCL_FILESYSTEM_READERS_SRC}
 	${VCL_FILESYSTEM_UTIL_INC}
 	${VCL_FILESYSTEM_UTIL_SRC}
+	${VCL_FILESYSTEM_WRITERS_INC}
+	${VCL_FILESYSTEM_WRITERS_SRC}
 	${VCL_FILESYSTEM_INC}
 	${VCL_FILESYSTEM_SRC}
 )
@@ -59,6 +71,7 @@ SET(SOURCE
 SOURCE_GROUP("mountpoints" FILES ${VCL_FILESYSTEM_MP_SRC} ${VCL_FILESYSTEM_MP_INC})
 SOURCE_GROUP("readers" FILES ${VCL_FILESYSTEM_READERS_SRC} ${VCL_FILESYSTEM_READERS_INC})
 SOURCE_GROUP("util" FILES ${VCL_FILESYSTEM_UTIL_SRC} ${VCL_FILESYSTEM_UTIL_INC})
+SOURCE_GROUP("writers" FILES ${VCL_FILESYSTEM_WRITERS_SRC} ${VCL_FILESYSTEM_WRITERS_INC})
 SOURCE_GROUP("" FILES ${VCL_FILESYSTEM_SRC} ${VCL_FILESYSTEM_INC})
 
 # Generate library
@@ -67,7 +80,6 @@ SET_TARGET_PROPERTIES(vcl.filesystem PROPERTIES FOLDER libs)
 SET_TARGET_PROPERTIES(vcl.filesystem PROPERTIES DEBUG_POSTFIX _d)
 
 TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/externals/ziplib/Source)
 
 TARGET_LINK_LIBRARIES(vcl.filesystem
 	ziplib
@@ -83,6 +95,7 @@ IF (VCL_BUILD_TESTS)
 	# Define the test files
 	SET(VCL_FILESYSTEM_TEST_SRC
 		test/basics.cpp
+		test/memoryfile.cpp
 	)
 
 	SOURCE_GROUP("" FILES ${VCL_FILESYSTEM_TEST_SRC})

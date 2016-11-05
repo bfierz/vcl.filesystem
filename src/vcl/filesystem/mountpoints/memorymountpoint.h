@@ -27,7 +27,12 @@
 // VCL configuration
 #include <vcl/config/global.h>
 
+// C++ standard library
+#include <memory>
+#include <vector>
+
 // VCL File System Library
+#include "../util/memoryfile.h"
 #include "../mountpoint.h"
 
 namespace Vcl { namespace FileSystem
@@ -35,10 +40,18 @@ namespace Vcl { namespace FileSystem
 	class MemoryMountPoint : public MountPoint
 	{
 	public:
+		MemoryMountPoint(std::string name, path mount_path);
 
 	protected:
+		std::shared_ptr<FileReader> createReader(const path& filename) override;
+		std::shared_ptr<FileWriter> createWriter(const path& filename) override;
 		bool exists(const path& entry) const override;
 
 	private:
+		std::shared_ptr<Util::MemoryFile> findMemoryFile(const path& filename) const;
+
+	private:
+		//! Current in-memory files
+		std::vector<std::shared_ptr<Util::MemoryFile>> _files;
 	};
 }}

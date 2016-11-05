@@ -27,6 +27,32 @@
 // VCL configuration
 #include <vcl/config/global.h>
 
+// C++ standard library
+#include <cstdint>
+#include <filesystem>
+
 namespace Vcl { namespace FileSystem
 {
+	class FileWriter
+	{
+	protected:
+		using path = std::experimental::filesystem::path;
+
+	public:
+		FileWriter(path virtual_path);
+
+		virtual void     seek(const uint64_t pos) = 0;
+		virtual void     write(void* buf, const uint64_t size) = 0;
+
+		virtual uint64_t pos() const = 0;
+
+	public: // Properties
+
+		//! \returns the path of the file within the virtual file system
+		const path& virtualPath() const { return _virtualPath; }
+
+	private:
+		//! Path of the file within the virtual file system
+		path _virtualPath;
+	};
 }}

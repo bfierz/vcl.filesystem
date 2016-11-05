@@ -32,6 +32,7 @@
 
 // VCL File System Library
 #include "filereader.h"
+#include "filewriter.h"
 
 namespace Vcl { namespace FileSystem
 {
@@ -41,12 +42,17 @@ namespace Vcl { namespace FileSystem
 		using path = std::experimental::filesystem::path;
 
 	public:
-		MountPoint(std::string name, path mount_path) : _name{ name }, _mountPath { mount_path } {}
+		MountPoint(std::string name, path mount_path);
 		
 		 /*!
 		  *	\brief Create a new file reader
 		  */
 		virtual std::shared_ptr<FileReader> createReader(const path& file_name) = 0;
+		
+		 /*!
+		  *	\brief Create a new file writer
+		  */
+		virtual std::shared_ptr<FileWriter> createWriter(const path& file_name) = 0;
 
 		//! 
 		virtual bool exists(const path& entry) const = 0;
@@ -54,6 +60,10 @@ namespace Vcl { namespace FileSystem
 		//! \returns the path in the virtual file system, where this mount-point is mounted.
 		const path mountPath() const { return _mountPath; }
 		
+	protected:
+		//! \returns the relative part of a filename for this mount point
+		path relativePath(const path& filename) const;
+
 	private:
 		//! Name of the mount point
 		std::string _name;

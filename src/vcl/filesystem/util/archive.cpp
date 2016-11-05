@@ -40,12 +40,24 @@ namespace Vcl { namespace FileSystem { namespace Util
 
 	bool Archive::entryExists(const path& entry) const 
 	{
-		return _entries.find(entry.string()) != _entries.end();
+		std::string str;
+		if (entry.has_root_directory())
+			str = entry.string().substr(1);
+		else
+			str = entry.string();
+
+		return _entries.find(str) != _entries.end();
 	}
 
-	std::shared_ptr<ZipArchiveEntry> Archive::entry(const path& entry_path) const
+	std::shared_ptr<ZipArchiveEntry> Archive::entry(const path& entry) const
 	{
-		return _entries.find(entry_path.string())->second;
+		std::string str;
+		if (entry.has_root_directory())
+			str = entry.string().substr(1);
+		else
+			str = entry.string();
+
+		return _entries.find(str)->second;
 	}
 
 	void Archive::enumerateFiles()

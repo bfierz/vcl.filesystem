@@ -22,3 +22,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "memorymountpoint.h"
+
+ // VCL File System Library
+#include "../readers/memoryfilereader.h"
+#include "../writers/memoryfilewriter.h"
+
+namespace Vcl { namespace FileSystem
+{
+	MemoryMountPoint::MemoryMountPoint(std::string name, path mount_path)
+	: MountPoint(std::move(name), std::move(mount_path))
+	{
+
+	}
+
+	std::shared_ptr<FileReader> MemoryMountPoint::createReader(const path& entry)
+	{
+		auto file = findMemoryFile(entry);
+		if (file)
+		{
+			return std::make_shared<MemoryFileReader>(file->relativePath(), std::move(file));
+		}
+		else
+		{
+			return{};
+		}
+	}
+	std::shared_ptr<FileWriter> MemoryMountPoint::createWriter(const path& entry)
+	{
+		auto file = findMemoryFile(entry);
+		if (file)
+		{
+			return std::make_shared<MemoryFileWriter>(file->relativePath(), std::move(file));
+		}
+		else
+		{
+			path rel_path = relativePath(entry);
+			_files.emplace_back(std::make_shared<Util::MemoryFile>(rel_path));
+			return std::make_shared<MemoryFileWriter>(rel_path, _files.back());
+		}
+	}
+	bool MemoryMountPoint::exists(const path& entry) const
+	{
+		return static_cast<bool>(findMemoryFile(entry));
+	}
+
+	std::shared_ptr<Util::MemoryFile> MemoryMountPoint::findMemoryFile(const path& filename) const
+	{
+		// Remove the mount path from the entry
+		path rel_path = relativePath(filename);
+
+		auto file_it = std::find_if(_files.begin(), _files.end(), [&rel_path](const std::shared_ptr<Util::MemoryFile>& file)
+		{
+			return file->relativePath() == rel_path;
+		});
+
+		if (file_it != _files.end())
+			return *file_it;
+		else
+			return{};
+	}
+}}
+

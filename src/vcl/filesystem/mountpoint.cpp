@@ -22,3 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "mountpoint.h"
+
+namespace Vcl { namespace FileSystem
+{
+	MountPoint::MountPoint(std::string name, path mount_path)
+	: _name{ name }
+	, _mountPath{ mount_path }
+	{
+	}
+
+	MountPoint::path MountPoint::relativePath(const path& filename) const
+	{
+		return filename.string().substr(mountPath().string().length());
+	}
+}}

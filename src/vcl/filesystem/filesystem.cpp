@@ -44,6 +44,12 @@ namespace Vcl { namespace FileSystem
 		return mp->createReader(file_name);
 	}
 
+	std::shared_ptr<FileWriter> FileSystem::createWriter(const path& file_name)
+	{
+		auto mp = findMountPoint(file_name);
+		return mp->createWriter(file_name);
+	}
+
 	bool FileSystem::exists(const path& entry)
 	{
 		auto mp = findMountPoint(entry);

@@ -38,16 +38,21 @@ namespace Vcl { namespace FileSystem
 	std::shared_ptr<FileReader> ArchiveMountPoint::createReader(const path& file_name)
 	{
 		// Remove the mount path from the entry
-		path rel_path = file_name.string().substr(mountPath().string().length() + 1);
+		path rel_path = relativePath(file_name);
 
 		auto entry = _archive.entry(rel_path);
 		return std::make_shared<ArchiveFileReader>(file_name, entry);
 	}
 
+	std::shared_ptr<FileWriter> ArchiveMountPoint::createWriter(const path& file_name)
+	{
+		return{};
+	}
+
 	bool ArchiveMountPoint::exists(const path& entry) const
 	{
 		// Remove the mount path from the entry
-		path rel_path = entry.string().substr(mountPath().string().length() + 1);
+		path rel_path = relativePath(entry);
 
 		return _archive.entryExists(rel_path);
 	}

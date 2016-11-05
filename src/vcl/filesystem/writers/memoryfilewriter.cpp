@@ -22,36 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#pragma once
-
-// VCL configuration
-#include <vcl/config/global.h>
-
-// VCL File System Library
-#include "../util/archive.h"
-#include "../mountpoint.h"
+#include "memoryfilewriter.h"
 
 namespace Vcl { namespace FileSystem
 {
-	class ArchiveMountPoint : public MountPoint
+	MemoryFileWriter::MemoryFileWriter(path virtual_path, std::shared_ptr<Util::MemoryFile> file)
+	: FileWriter(virtual_path)
+	, _file(std::move(file))
 	{
-	public:
-		/*!
-		 *	\brief Create a new mount point
-		 *	\param mount_path path to mount the volume directory to
-		 *	\param volume_path path to an archive on an actual volume to be mounted
-		 *
-		 *	Create a new mount point that maps an archive on a native volume to a specific mount point
-		 */
-		ArchiveMountPoint(std::string name, path mount_path, path volume_path);
+	}
 
-	protected:
-		std::shared_ptr<FileReader> createReader(const path& file_name) override;
-		std::shared_ptr<FileWriter> createWriter(const path& file_name) override;
-		bool exists(const path& entry) const override;
+	void MemoryFileWriter::seek(const uint64_t pos)
+	{
+		_curr_pos = pos;
+	}
 
-	private:
-		//! Mounted archive 
-		Util::Archive _archive;
-	};
+	void MemoryFileWriter::write(void* buf, const uint64_t buffer_size)
+	{
+		_file->write(_curr_pos, buf, buffer_size);
+		_curr_pos += buffer_size;
+	}
+
+	uint64_t MemoryFileWriter::pos() const
+	{
+		return _curr_pos;
+	}
 }}

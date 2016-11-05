@@ -22,3 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "filewriter.h"
+
+namespace Vcl { namespace FileSystem
+{
+	FileWriter::FileWriter(path virtual_path)
+	: _virtualPath(std::move(virtual_path))
+	{
+
+	}
+}}
+

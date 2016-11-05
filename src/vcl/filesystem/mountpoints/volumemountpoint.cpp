@@ -40,6 +40,11 @@ namespace Vcl { namespace FileSystem
 		return std::make_shared<VolumeFileReader>(file_name, convertToVolumePath(file_name));
 	}
 
+	std::shared_ptr<FileWriter> VolumeMountPoint::createWriter(const path& file_name)
+	{
+		return{};
+	}
+
 	bool VolumeMountPoint::exists(const path& entry) const
 	{
 		// Check if the file exists on disk
@@ -49,7 +54,7 @@ namespace Vcl { namespace FileSystem
 	VolumeMountPoint::path VolumeMountPoint::convertToVolumePath(const path& virtual_path) const
 	{
 		// Remove the mount path from the entry
-		path rel_path = virtual_path.string().substr(mountPath().string().length());
+		path rel_path = relativePath(virtual_path);
 
 		// Append it to the volume path
 		auto abs_path = _volumePath / rel_path;

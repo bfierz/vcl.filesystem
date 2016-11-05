@@ -34,6 +34,7 @@
 
 // VCL File System Library
 #include "filereader.h"
+#include "filewriter.h"
 #include "mountpoint.h"
 
 namespace Vcl { namespace FileSystem
@@ -52,6 +53,11 @@ namespace Vcl { namespace FileSystem
 		  *	\brief Create a new file reader
 		  */
 		std::shared_ptr<FileReader> createReader(const path& file_name);
+		
+		 /*!
+		  *	\brief Create a new file writer
+		  */
+		std::shared_ptr<FileWriter> createWriter(const path& file_name);
 
 		 /*!
 		  *	\brief Check if a path exists
