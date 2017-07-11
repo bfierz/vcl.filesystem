@@ -30,10 +30,12 @@ SET(VCL_FILESYSTEM_MP_SRC
 SET(VCL_FILESYSTEM_UTIL_INC
 	src/vcl/filesystem/util/archive.h
 	src/vcl/filesystem/util/memoryfile.h
+	src/vcl/filesystem/util/webdavclient.h
 )
 SET(VCL_FILESYSTEM_UTIL_SRC
 	src/vcl/filesystem/util/archive.cpp
 	src/vcl/filesystem/util/memoryfile.cpp
+	src/vcl/filesystem/util/webdavclient.cpp
 )
 SET(VCL_FILESYSTEM_WRITERS_INC
 	src/vcl/filesystem/writers/memoryfilewriter.h
@@ -80,9 +82,15 @@ SET_TARGET_PROPERTIES(vcl.filesystem PROPERTIES FOLDER libs)
 SET_TARGET_PROPERTIES(vcl.filesystem PROPERTIES DEBUG_POSTFIX _d)
 
 TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+TARGET_INCLUDE_DIRECTORIES(vcl.filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/externals/neon-0.30.2/src)
 
 TARGET_LINK_LIBRARIES(vcl.filesystem
 	ziplib
+	${CMAKE_CURRENT_SOURCE_DIR}/externals/neon-0.30.2/libneon.lib
+	D:/libs/expat-2.2.0/Bin/libexpat.lib
+	ws2_32.lib
+	Crypt32.lib
+	Netapi32.lib
 )
 
 # File System Unit Tests
@@ -96,6 +104,7 @@ IF (VCL_BUILD_TESTS)
 	SET(VCL_FILESYSTEM_TEST_SRC
 		test/basics.cpp
 		test/memoryfile.cpp
+		test/webdav.cpp
 	)
 
 	SOURCE_GROUP("" FILES ${VCL_FILESYSTEM_TEST_SRC})
